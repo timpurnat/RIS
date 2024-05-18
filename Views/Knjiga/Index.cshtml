@@ -1,0 +1,107 @@
+@model PaginatedList<web.Models.Izdelek>
+@using help
+@{
+    ViewData["Title"] = "Index";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+ <style>
+   
+        .book-image {
+            height: 400px; 
+            object-fit: cover; 
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Katalog</h1>
+
+    <p>
+        @if (User.IsInRole("Administrator") || User.IsInRole("Manager"))
+        {
+            <a asp-action="Create">Dodaj Izdelek</a>
+        }
+    </p>
+    <form asp-action="Index" method="get" id="sortForm">
+        <p>
+            Search by name: <input type="text" name="searchString" />
+            <input type="submit" value="Search" />
+        </p>
+      
+    
+       
+    </form>
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src=@item.ImageLink class="card-img-top book-image" alt="Book Image">
+                    <div class="card-body">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.Naslov)</h5>
+                        <p class="card-text">
+                
+                            <strong>Kategorija:</strong> @Html.DisplayFor(modelItem => item.Kategorija.imeKategorije)<br />
+                            <strong>Kakovost:</strong> @Html.DisplayFor(modelItem => item.Ocena)
+                        </p>
+                        <div class="text-center">
+                    
+                            <a asp-action="Rezervacija" asp-route-id="@item.IzdelekId" class="btn btn-success">Sposodi</a>
+
+                            <a asp-action="Details" asp-route-id="@item.IzdelekId" class="btn btn-primary">Podrobnosti</a>
+
+                            @if (User.IsInRole("Administrator") || User.IsInRole("Manager"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.IzdelekId" class="btn btn-secondary">Uredi</a>
+                                <a asp-action="Delete" asp-route-id="@item.IzdelekId" class="btn btn-danger">Zbriši</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PageIndex - 1)">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link" href="?page=@i">@i</a>
+                    </li>
+                }
+
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="?page=@(Model.PageIndex + 1)">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Next</span>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>
